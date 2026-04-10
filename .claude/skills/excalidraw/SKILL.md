@@ -78,7 +78,28 @@ When creating 3 options, vary these dimensions:
 
 ---
 
-## Design Preferences
+## Design Principles
+
+### #1 Rule: Transparent Backgrounds (CRITICAL)
+
+**Always use `"backgroundColor": "transparent"` on shapes.** This is the single biggest design improvement. Filled rectangles look flat and amateurish. Transparent boxes with colored strokes look professional, especially on dark canvases where the background shows through.
+
+The only exceptions:
+- **Badge circles** (numbered steps) -- these get solid fills so the number is readable
+- **Glow effect layers** -- these use low-opacity fills behind the main shape
+- **Scatter plot dots** -- small data points that need to be visible
+
+Everything else: transparent background, colored stroke only.
+
+```json
+{"type": "rectangle", "x": 100, "y": 100, "width": 200, "height": 60,
+ "backgroundColor": "transparent", "strokeColor": "#3b82f6", "roughness": 0,
+ "text": "My Service"}
+```
+
+### Dark Canvas First
+
+Design for dark mode. Use bright stroke colors (`#3b82f6`, `#22c55e`, `#a78bfa`) against the dark canvas. Light gray text (`#cbd5e1`, `#e2e8f0`) for body copy. Muted gray (`#64748b`, `#94a3b8`) for secondary text and subtitles. Gold (`#fbbf24`) for footer taglines.
 
 ### Language
 - **Always use plain language** -- no technical jargon unless explicitly asked
@@ -87,44 +108,87 @@ When creating 3 options, vary these dimensions:
 
 ### Color Palette
 
-Use color to encode meaning consistently. Pick a primary color that suits the diagram's subject.
+Each color has a stroke (for borders/outlines) and a fill (only for badges/dots). Use stroke colors on shapes with transparent backgrounds.
 
-| Role | Stroke | Fill |
-|------|--------|------|
-| **Blue** | `#1971c2` | `#a5d8ff` |
-| **Green** | `#2f9e44` | `#b2f2bb` |
-| **Red** | `#e03131` | `#ffc9c9` |
-| **Orange** | `#e8590c` | `#ffd8a8` |
-| **Purple** | `#9c36b5` | `#eebefa` |
-| **Yellow** | `#e8590c` | `#ffec99` |
-| **Gray** | `#868e96` | `#e9ecef` |
+| Color | Stroke | Fill (badges only) |
+|-------|--------|-------------------|
+| **Blue** | `#3b82f6` | `#3b82f6` |
+| **Purple** | `#8b5cf6` | `#8b5cf6` |
+| **Green** | `#22c55e` | `#22c55e` |
+| **Orange/Amber** | `#f59e0b` | `#f59e0b` |
+| **Red** | `#ef4444` | `#ef4444` |
+| **Cyan** | `#06b6d4` | `#06b6d4` |
+| **Pink** | `#ec4899` | `#ec4899` |
+| **Lime** | `#a3e635` | `#a3e635` |
+| **Gray (structure)** | `#475569` | -- |
+| **Gray (subtle)** | `#334155` | -- |
+
+**Text colors:**
+| Role | Hex |
+|------|-----|
+| Title / heading | `#e2e8f0` |
+| Body text | `#cbd5e1` |
+| Subtitle / secondary | `#64748b` or `#94a3b8` |
+| Footer tagline | `#fbbf24` |
+| Code / monospace | `#22c55e` (prompt) or `#94a3b8` (body) |
+
+### Colored Dot Bullets
+
+Instead of text bullet characters (`•`), use small filled ellipses next to free-standing text. This looks dramatically better:
+
+```json
+{"type": "ellipse", "x": 105, "y": 345, "width": 12, "height": 12,
+ "backgroundColor": "#3b82f6", "strokeColor": "#3b82f6", "roughness": 0},
+{"type": "text", "x": 128, "y": 340, "width": 300, "height": 22,
+ "text": "Think through problems", "fontSize": 16, "fontFamily": "excalifont", "strokeColor": "#cbd5e1"}
+```
+
+Use a different color for each bullet to add visual variety. Keep dots at 10-12px diameter.
 
 ### Visual Elements
-- **Emojis as icons** -- use relevant emojis in labels (e.g., "🧠 Claude thinks", "🎨 Drawing appears")
-- **Numbered badge circles** -- solid-filled circles with white numbers for step sequences
+- **Emojis as icons** -- use relevant emojis in labels (e.g., "🧠 Think", "⚡ Act")
+- **Numbered badge circles** -- solid-filled circles with numbers for step sequences
   - Use `roughness: 0` for clean badge circles
-  - Badge size: 50x50px, font size 24, white text on colored fill
-- **Punchy footer tagline** -- include a one-liner at the bottom that captures the "so what" of the diagram
+  - Badge size: 40x40px, font size 20
+- **Punchy footer tagline** -- include a one-liner at the bottom in gold (`#fbbf24`) that captures the "so what"
+- **Section divider lines** -- thin dashed lines (`strokeColor: "#334155"`, `strokeStyle: "dashed"`) between sections
+- **Separator lines inside cards** -- thin solid lines below the title area to separate header from content
 
 ### Font Rules
 - **Helvetica** (`"helvetica"`) -- titles, headings, and labels (clean and professional)
-- **Excalifont** (`"excalifont"`) -- descriptions, examples, secondary text (friendly hand-drawn feel)
+- **Excalifont** (`"excalifont"`) -- descriptions, bullets, secondary text (friendly hand-drawn feel)
+- **Monospace** (`3`) -- code snippets, terminal prompts, file names
 - Do NOT use Lilita One (too cartoony) or Comic Shanns
 
 | Element | Font | Size |
 |---------|------|------|
-| Diagram title | Helvetica | 36px |
-| Section heading | Helvetica | 22px |
-| Element label | Helvetica | 16px |
-| Description text | Excalifont | 14px |
-| Footer tagline | Excalifont | 18px |
+| Diagram title | Helvetica | 24-44px |
+| Section heading | Helvetica | 20-28px |
+| Element label | Helvetica | 14-16px |
+| Description / bullets | Excalifont | 13-16px |
+| Subtitle | Excalifont | 13-15px |
+| Footer tagline | Excalifont | 12-13px |
+| Code text | Monospace | 11-14px |
 
 ### Text Handling (CRITICAL -- prevent overflow)
-- **Minimum box width: 600px** for any box containing a heading + description
 - **Always pre-wrap text** with manual `\n` line breaks -- never rely on auto-wrap
 - **Max ~40 characters per line** for description text at 14px font
 - **Max ~35 characters per line** for heading text at 22px font
 - **20px+ padding** between text and box edges on all sides
+- For simple label-only boxes, size width to `max(100, labelCharCount * 9)`
+
+### Building Section by Section
+
+For complex diagrams, build one section at a time using `batch_create_elements`. This prevents overwhelming the canvas and makes debugging easier. Take a screenshot after each section to verify before moving on.
+
+### Multi-Diagram Layouts
+
+When placing multiple diagrams on one canvas, use a grid layout:
+- **2 diagrams:** side by side, ~530px apart
+- **3 diagrams:** row of 3, ~530px column spacing
+- **6 diagrams (3x2):** columns at x=50, x=560, x=1080. Rows at y=20, y=460. Each cell ~480px wide, ~420px tall.
+
+Namespace all element IDs by diagram number (e.g., `d1-title`, `d2-hub`, `d3-s1`) to avoid collisions.
 
 ---
 
@@ -161,8 +225,10 @@ Low-opacity background rectangles group related elements. Use a free-standing te
 Arrows snap to shapes using element IDs. Labels describe the relationship.
 
 ```json
-{"id": "svc-a", "type": "rectangle", "x": 100, "y": 100, "width": 160, "height": 60, "text": "API Gateway"},
-{"id": "svc-b", "type": "rectangle", "x": 400, "y": 100, "width": 160, "height": 60, "text": "Database"},
+{"id": "svc-a", "type": "rectangle", "x": 100, "y": 100, "width": 160, "height": 60,
+ "backgroundColor": "transparent", "strokeColor": "#3b82f6", "roughness": 0, "text": "API Gateway"},
+{"id": "svc-b", "type": "rectangle", "x": 400, "y": 100, "width": 160, "height": 60,
+ "backgroundColor": "transparent", "strokeColor": "#22c55e", "roughness": 0, "text": "Database"},
 {"type": "arrow", "x": 0, "y": 0, "startElementId": "svc-a", "endElementId": "svc-b", "text": "SQL"}
 ```
 
@@ -177,11 +243,16 @@ Arrows snap to shapes using element IDs. Labels describe the relationship.
 Classic flowchart branching with Yes/No paths.
 
 ```json
-{"id": "decision", "type": "diamond", "x": 300, "y": 200, "width": 140, "height": 100, "text": "Auth OK?"},
-{"id": "yes-path", "type": "rectangle", "x": 150, "y": 380, "width": 140, "height": 60, "text": "Proceed"},
-{"id": "no-path", "type": "rectangle", "x": 450, "y": 380, "width": 140, "height": 60, "text": "Reject"},
-{"type": "arrow", "x": 0, "y": 0, "startElementId": "decision", "endElementId": "yes-path", "text": "Yes"},
-{"type": "arrow", "x": 0, "y": 0, "startElementId": "decision", "endElementId": "no-path", "text": "No"}
+{"id": "decision", "type": "diamond", "x": 300, "y": 200, "width": 140, "height": 100,
+ "backgroundColor": "transparent", "strokeColor": "#f59e0b", "roughness": 0, "text": "Auth OK?"},
+{"id": "yes-path", "type": "rectangle", "x": 150, "y": 380, "width": 140, "height": 60,
+ "backgroundColor": "transparent", "strokeColor": "#22c55e", "roughness": 0, "text": "Proceed"},
+{"id": "no-path", "type": "rectangle", "x": 450, "y": 380, "width": 140, "height": 60,
+ "backgroundColor": "transparent", "strokeColor": "#ef4444", "roughness": 0, "text": "Reject"},
+{"type": "arrow", "x": 0, "y": 0, "startElementId": "decision", "endElementId": "yes-path",
+ "strokeColor": "#22c55e", "text": "Yes"},
+{"type": "arrow", "x": 0, "y": 0, "startElementId": "decision", "endElementId": "no-path",
+ "strokeColor": "#ef4444", "text": "No"}
 ```
 
 ### 6. Mixed Shape Types
@@ -207,7 +278,8 @@ Emojis render beautifully at any size. Use them to make labels scannable:
 
 ```json
 {"type": "rectangle", "x": 100, "y": 100, "width": 200, "height": 60,
- "text": "🧠 Claude thinks", "backgroundColor": "#a5d8ff"}
+ "backgroundColor": "transparent", "strokeColor": "#3b82f6", "roughness": 0,
+ "text": "🧠 Claude thinks"}
 ```
 
 ### 9. Mermaid Conversion
@@ -279,9 +351,15 @@ Always assign custom `id` values (e.g., `"id": "auth-svc"`) so arrows can refere
 
 | Element | Width | Height |
 |---------|-------|--------|
-| Step card (vertical) | 620px | 110px |
-| Step card (horizontal) | 180px | 140px |
-| Badge circle | 50px | 50px |
+| Step card (vertical) | 340-460px | 40-55px |
+| Step card (horizontal) | 110-220px | 38-55px |
+| Badge circle | 40px | 40px |
+| Bullet dot | 10-12px | 10-12px |
+| Hub node (ellipse) | 140px | 65px |
+| Satellite node | 100-130px | 38-45px |
+| Code block | 240-700px | 50px |
+| Layer row | 460-600px | 45px |
+| Inner service box | 90-100px | 28-32px |
 
 ---
 
@@ -306,6 +384,8 @@ If anything fails: stop, fix it, re-screenshot, then continue.
 
 ## Anti-Patterns (DO NOT do these)
 
+- **Filled backgrounds on shapes** -- use `"backgroundColor": "transparent"` always (except badges/dots)
+- **Text bullet characters** (`•`, `-`) -- use colored ellipse dots instead
 - Single-line text that overflows the box edge
 - Technical jargon without being asked for it
 - Skipping the 3-variation step
@@ -314,6 +394,8 @@ If anything fails: stop, fix it, re-screenshot, then continue.
 - Tiny fonts below 14px
 - Boxes narrower than 600px when they contain multi-line text
 - Forgetting to save snapshots before moving to the next variation
+- Building the entire diagram in one `batch_create_elements` call -- build section by section
+- Using the same stroke color for every element -- vary colors to encode meaning
 
 ---
 
